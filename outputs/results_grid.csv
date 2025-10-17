@@ -1,0 +1,13 @@
+noise_type,noise_level,fuzzy_acc,snn_acc
+gaussian,0.0,0.6225,0.9356
+gaussian,0.1,0.1421,0.3352
+gaussian,0.3,0.1056,0.1569
+gaussian,0.5,0.1045,0.1335
+saltpepper,0.0,0.6225,0.9356
+saltpepper,0.1,0.1253,0.2595
+saltpepper,0.3,0.1049,0.1381
+saltpepper,0.5,0.0982,0.1153
+dropout,0.0,0.6225,0.9356
+dropout,0.1,0.6361,0.9332
+dropout,0.3,0.6283,0.9065
+dropout,0.5,0.5489,0.8461
