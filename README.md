@@ -1,5 +1,5 @@
 # IS-Project
-Group assignement of is made by me 100514 and saul 100266
+This Group assignement is made by me 100514 and saul 100266
 
 Noise Robustness: Fuzzy Models vs Shallow Neural Nets (MNIST)
 This repo compares how fuzzy models and a shallow neural network (SNN) degrade under data noise using MNIST.
