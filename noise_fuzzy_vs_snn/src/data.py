@@ -6,14 +6,6 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from torchvision import datasets, transforms
 
-def load_kaggle_csv(path):
-    """Load Kaggle MNIST CSV: train.csv with label + 784 pixel columns."""
-    df = pd.read_csv(path)
-    if 'label' not in df.columns:
-        raise ValueError('CSV must contain a label column')
-    y = df['label'].values.astype(np.int64)
-    X = df.drop(columns=['label']).values.astype(np.float32) / 255.0
-    return X, y
 
 def load_torchvision_mnist(root, train=True):
     ds = datasets.MNIST(root=root, train=train, download=True, transform=transforms.ToTensor())
@@ -22,27 +14,29 @@ def load_torchvision_mnist(root, train=True):
     y = ds.targets.numpy().astype(np.int64)
     return X, y
 
-def load_mnist(root='data', prefer_kaggle=True):
-    kaggle_train = os.path.join(root, 'kaggle', 'train.csv')
-    kaggle_test  = os.path.join(root, 'kaggle', 'test.csv')
-    if prefer_kaggle and os.path.exists(kaggle_train):
-        X, y = load_kaggle_csv(kaggle_train)
-        # Split a validation set from end
-        n = len(X)
-        n_train = int(n * 0.9)
-        X_train, y_train = X[:n_train], y[:n_train]
-        X_val, y_val = X[n_train:], y[n_train:]
-        # Optional test.csv may not have labels; we can ignore or use validation as test
-        return (X_train, y_train), (X_val, y_val), None
-    else:
-        Xtr, ytr = load_torchvision_mnist(root=root, train=True)
-        Xte, yte = load_torchvision_mnist(root=root, train=False)
-        # create a val split from train
-        n = len(Xtr)
-        n_train = int(n * 0.9)
-        X_train, y_train = Xtr[:n_train], ytr[:n_train]
-        X_val, y_val = Xtr[n_train:], ytr[n_train:]
-        return (X_train, y_train), (X_val, y_val), (Xte, yte)
+def load_mnist(root='data'):
+    """Load MNIST from TorchVision and split into train/val/test."""
+    from torchvision import datasets, transforms
+    ds_train = datasets.MNIST(root=root, train=True, download=True, transform=transforms.ToTensor())
+    ds_test  = datasets.MNIST(root=root, train=False, download=True, transform=transforms.ToTensor())
+
+    Xtr = ds_train.data.numpy().astype(np.float32) / 255.0
+    ytr = ds_train.targets.numpy().astype(np.int64)
+    Xtst = ds_test.data.numpy().astype(np.float32) / 255.0
+    ytst = ds_test.targets.numpy().astype(np.int64)
+
+    # create validation split (10%)
+    n_train = int(0.9 * len(Xtr))
+    X_train, y_train = Xtr[:n_train], ytr[:n_train]
+    X_val, y_val = Xtr[n_train:], ytr[n_train:]
+
+    # flatten 28x28 → 784
+    X_train = X_train.reshape(len(X_train), -1)
+    X_val = X_val.reshape(len(X_val), -1)
+    Xtst = Xtst.reshape(len(Xtst), -1)
+
+    return (X_train, y_train), (X_val, y_val), (Xtst, ytst)
+
 
 class PCATransformer:
     """Fit PCA on clean training data, return transform utilities."""

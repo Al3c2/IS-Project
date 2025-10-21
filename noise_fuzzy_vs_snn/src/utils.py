@@ -38,5 +38,5 @@ def plot_curve(xs, ys_dict, title, xlabel, ylabel, out_png):
 def compute_metrics(y_true, y_pred):
     acc = accuracy_score(y_true, y_pred)
     cm = confusion_matrix(y_true, y_pred)
-    report = classification_report(y_true, y_pred, output_dict=True)
+    report = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
     return acc, cm, report
